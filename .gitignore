@@ -3,8 +3,6 @@
 .Rapp.history
 
 # input and output file 
-./input/*
-./output/*
 
 # Session Data files
 .RData
