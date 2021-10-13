@@ -1,8 +1,8 @@
 ########### Description ####
 #create time: Fri Jul 23 14:56:19 2021
 ########### hyperparameter and library #####
-output_path <- "./output/pos"
 input_path <- "./input/"
+output_path <- "./output/pos"
 library(tidyverse)
 library(Biostrings)
 addname <- function(li){

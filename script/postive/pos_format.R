@@ -2,12 +2,12 @@
 # Put mutation and wild peptides together 
 
 #### hyperparameter and library #### 
-input_path <- ""
-output_path <- ""
+input_path <- "./output/pos/"
+output_path <- "./output/pos/"
 library(tidyverse)
 
-#### Main #### 
-reformat.fraction.mutation <- read.table("./output_20210824/mutate.netMHCoutput.tsv",
+#### format #### 
+reformat.fraction.mutation <- read.table(paste0(input_path,"mutate.netMHCoutput.tsv"),
                                          sep = "\t")
 reformat.fraction.mutation <- reformat.fraction.mutation %>% 
   unite(col = "BindLevel",c(V17,V18),sep = "",remove = TRUE)
@@ -17,7 +17,7 @@ reformat.fraction.mutation <- reformat.fraction.mutation %>%
   select("MHC","Peptide","Aff(nM)","BindLevel")
 colnames(reformat.fraction.mutation) <- paste0("mut_",colnames(reformat.fraction.mutation))
 
-reformat.fraction.wild <- read.table("./output_20210824/wild.netMHCoutput.tsv",
+reformat.fraction.wild <- read.table(paste0(input_path,"wild.netMHCoutput.tsv"),
                                      sep = "\t")
 reformat.fraction.wild <- reformat.fraction.wild %>% 
   unite(col = "BindLevel",c(V17,V18),sep = "",remove = TRUE)
@@ -40,5 +40,5 @@ pos.neoantigens.relocate <- pos.neoantigens %>%
 pos.neoantigens.filtered <- pos.neoantigens.relocate %>% 
   filter(wild_BindLevel == "" & mut_BindLevel != "")
 
-write.table(pos.neoantigens.filtered,file = "./output_20210824/final.pos.neoantigens.filtered.tsv",
+write.table(pos.neoantigens.filtered,file = paste0(output_path,"final.pos.neoantigens.filtered.tsv"),,
             sep = "\t",row.names = F,quote = F)

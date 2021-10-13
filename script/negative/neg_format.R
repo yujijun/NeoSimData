@@ -1,4 +1,12 @@
+#### Description #### 
+# Put mutation and wild peptides together 
+
+#### Hyperparameter and library #### 
+input_path <- "./output/neg/"
+output_path <- "./output/neg/"
 library(tidyverse)
+
+#### Main ####
 reformat.fraction.mutation <- read.table("./output/ncbi/fraction.mutate.fsa.out.1.Rformat.tsv",
                                 sep = "\t")
 colnames(reformat.fraction.mutation) <- reformat.fraction.mutation[1,]

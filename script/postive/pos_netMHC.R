@@ -1,15 +1,14 @@
 #### Description ######## 
 # formatting result form pos_main.R and running netMHCpan
-
 #### library and hyperparameter ##### 
 library(tidyverse)
 library(Biostrings)
 library(seqinr)
-input_path <- "/mnt/data/yjj/pos_data/input"
-output_path <- "./output/pos"
+input_path <- "./output/pos/"
+output_path <- "./output/pos/"
 ############### 1 input and preprocess input dataset #####
 #### 1.1 load final result ####
-load("./output_20210824/final.result.RData")
+load(paste0(input_path,"final.result.RData"))
 #### 1.2 convert final result list into a dataframe ####
 for(i in length(final_result):1){
   if(!is.null(final_result[[i]])){
@@ -21,7 +20,7 @@ finalResult.df <- do.call(rbind.data.frame,final_result)
 
 #### 1.3 proteinomics dataset preprocess####
 library(Biostrings)
-proteinomics <- readAAStringSet(filepath = "./uniprot-proteome_UP000005640.fasta")
+proteinomics <- readAAStringSet(filepath = "./input/uniprot-proteome_UP000005640.fasta")
 omics_seq <- as.character(proteinomics,use.names =F)
 omics_name <- names(proteinomics)
 omics_seq <- as.data.frame(omics_seq) 
@@ -43,7 +42,7 @@ omicsMatrix.df <- omicsMatrix.df %>%
   select(gene_name_v1,startPos,endPos,ncut,seq_length,omics_seq,gene_name)
 save(omicsMatrix.df,file = paste0(output_path,"/omics_matrix.RData"))
 #### 1.4 Tcell dataset preprocess #####
-Tcell_v3 <- read.delim(stringr::str_c(input_path,"tcell_full_v3.csv"),sep = ",",header = T)
+Tcell_v3 <- read.delim("./input/tcell_full_v3.csv",sep = ",",header = T)
 Tcell_v3_clean <- Tcell_v3 %>%  
   dplyr::select(matches("Epitope")|matches("Host")|matches("Assay")|matches("MHC"))
 colnames(Tcell_v3_clean) <- Tcell_v3_clean[1,]

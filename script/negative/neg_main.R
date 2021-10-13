@@ -3,8 +3,6 @@
 # Update Time ：2021-08-22 10:19
 
 #### hyperparameter and library #### 
-work_path <-"./"
-setwd(work_path)
 input_path <- stringr::str_c(work_path,"input/")
 output_path <- stringr::str_c(work_path,"output/neg")
 testGeneNumber <- 3 ### All genes need so much time,we can just test some genes.
@@ -12,20 +10,20 @@ testGeneNumber <- 3 ### All genes need so much time,we can just test some genes.
 library(tidyverse)
 library(Biostrings)
 
-source("./script/Commonfunction.R")
+source("./script/CodonTable.R")
 time1 <- Sys.time()
 ######### 1 input and data preprocessing ####
 #### 1.0 input vcf\GFF\mRNArefseq ####
-ncbi_vcf <- read.table(file = stringr::str_c(input_path,"ncbi/common_all_20180418_snp.recode.maf5.nsm.vcf"))
+ncbi_vcf <- read.table(file = stringr::str_c(input_path,"common_all_20180418_snp.recode.maf5.nsm.vcf"))
 colnames(ncbi_vcf) <- c("CHROM",	"POS",	"ID",	"REF",
                         "ALT",	"QUAL",	"FILTER",	"INFO")
 
-ncbi_GFF <- read.table(file = stringr::str_c(input_path,"ncbi/GRCh38_latest_genomic.gff"),
+ncbi_GFF <- read.table(file = stringr::str_c(input_path,"GRCh38_latest_genomic.gff"),
                        nrows = -1,sep = "\t") 
 colnames(ncbi_GFF) <- c("seqid","source","type",
                         "start","end","score",
                         "strand","phase","attributes")
-ncbi_refmrna <- readDNAStringSet(filepath = stringr::str_c(input_path,"ncbi/GRCh38_latest_rna.fna"))
+ncbi_refmrna <- readDNAStringSet(filepath = stringr::str_c(input_path,"GRCh38_latest_rna.fna"))
 ncbi_mrna_name <- names(ncbi_refmrna)
 ncbi_mrna_seq <- as.character(ncbi_refmrna)
 #### 1.1 preprocess of vcf  ####

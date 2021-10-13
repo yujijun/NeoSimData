@@ -3,8 +3,8 @@
 ################ library and hyperparameter ####
 library(seqinr)
 library(tidyverse)
-output_path <- "output/neg"
-input_path <- "output/neg"
+output_path <- "./output/neg"
+input_path <- "./output/neg"
 ################ Convert df5.5 into fraction.mutate / wild fsa ##### 
 load(paste0(input_path,"ncbi_final_df.5.5.RData"))
 df.5.6 <- df.5.5 %>% 
