@@ -16,14 +16,22 @@ HLA alleles of the positive set.
 
 For all the obtained peptides datasets, it is recommended to use the netMHCpan algorithm to calculate the affinity, and use the affinity value for further screening.
 
-This method has been proven effective and can be used in machine learning algorithms for Determination of immunogenic neo-antigens[], while our method was an update version, user can simulate the desired HLA alleles according to their own needs and use netMHCpan for the second round of screening.In this tutorial,we use HLA-A*02:01 as an example.
+This method has been proven effective and can be used in machine learning algorithms for Determination of immunogenic neo-antigens[], while our method was an update version, user can simulate the desired HLA alleles according to their own needs and use netMHCpan for the second round of screening.The results of netMHCpan show that most of the modeled positive peptides have lower binding affinity(nM), and the negative peptides have higher binding affinity(nM), which further proves the effectiveness of this method.
+
+In this tutorial,we use HLA-A*02:01 as an example.
 
 # Requirement 
-Need to install netMHCpan and change 
+Need to install netMHCpan 
 # Usage:
+```
+git clone git@github.com:yujijun/NeoSimData.git
+cd NeoSimData 
+```
+
 1. Download needed datasets
 2. running all dataset.
 
+Output example 
 Reference:
 
 
