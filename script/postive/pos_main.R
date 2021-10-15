@@ -1,10 +1,13 @@
 ########### Description ####
 #create time: Fri Jul 23 14:56:19 2021
+# Description: The script is used to generate simulated neopeptides.
+
 ########### hyperparameter and library #####
 input_path <- "./input/"
 output_path <- "./output/pos"
 library(tidyverse)
 library(Biostrings)
+library(seqinr)
 addname <- function(li){
   # addname for each list 
   for(i in 1:length(li)){
@@ -20,14 +23,12 @@ timeRecord <- function(start_time){
   # but you have to be careful about time-zone issues
   format(.POSIXct(dt,tz="GMT"), "%H:%M:%S")
 }
-########## 1. dataset preprocess #####
+########## 1 dataset preprocess #####
 #### 1.1 generate protein omics list ####
 # reformat uniprot-proteome_UP000005640.fasta file
-library(Biostrings)
 proteinomics <- readAAStringSet(filepath = paste0(input_path,"uniprot-proteome_UP000005640.fasta"))
 omics_seq <- as.character(proteinomics,use.names =F)
 omics_name <- names(proteinomics)
-#omics_all <- stringr::str_c(omics_seq,collapse = "")
 omics_seq <- as.data.frame(omics_seq) 
 omics_matrix <- omics_seq %>% 
   mutate(gene_name = omics_name,.before = 1) %>% 
@@ -37,7 +38,16 @@ omics_matrix <- omics_seq %>%
 omics_matrix <- purrr::map(omics_matrix,~add_column(.x,
                                                     sum_length = cumsum(.x$seq_length)))
 omics_seq_list <- purrr::map(omics_matrix,~stringr::str_c(.x$omics_seq,collapse = ""))
-
+omicsMatrix.df <- do.call(rbind.data.frame,omics_matrix)
+omicsMatrix.df <- omicsMatrix.df %>% 
+  mutate(gene_name_v1 = stringr::str_match(gene_name,pattern = "\\|\\w*_HUMAN")) %>% 
+  mutate(gene_name_v1 = stringr::str_remove(gene_name_v1,pattern = "\\|")) %>% 
+  mutate(gene_name_v1 = stringr::str_remove(gene_name_v1,pattern = "_HUMAN")) %>% 
+  relocate(gene_name_v1,.after = gene_name) %>% 
+  mutate(startPos = c(1,na.omit(lag(cumsum_length)) + 1)) %>% 
+  dplyr::rename(endPos = cumsum_length) %>% 
+  select(gene_name_v1,startPos,endPos,ncut,seq_length,omics_seq,gene_name)
+save(omicsMatrix.df,file = paste0(output_path,"/omics_matrix.RData"))
 #### 1.2 IEDB varified peptides list ####
 # generate verified peptide list 
 Tcell_v3 <- read.delim(stringr::str_c(input_path,"tcell_full_v3.csv"),sep = ",",header = T)
@@ -71,10 +81,10 @@ Tcell_v3_human <-Tcell_v3_clean %>%
 Tcell_v3_human <- Tcell_v3_human[!(str_detect(Tcell_v3_human,pattern = "\\+") |
                                      str_detect(Tcell_v3_human,pattern = "\\(") |
                                      str_detect(Tcell_v3_human,pattern = "-"))]
-
+save(Tcell_v3_human,file = paste0(output_path,"/Tcell_v3_human.RData"))
 peptide_list <- Tcell_v3_human %>% as.list()
 
-########### 2. All Needed function ####
+########### 2 All Needed function ####
 #### 2.1 Function to create a string pattern ####
 Create.pattern <- function(string){
   #this is a function to create all pattern of a string
@@ -151,7 +161,7 @@ All.match.strings <- function(dataset){
   return(all.result)
 }
 
-########### 3. Running ####
+########### 3 Running ####
 #### 3.1 create all pattern ####
 All.pattern <- purrr::map(peptide_list,Create.pattern) %>% 
   unlist() %>% as.list() %>% addname()
@@ -159,6 +169,76 @@ All.pattern <- purrr::map(peptide_list,Create.pattern) %>%
 print("It's ready to running")
 final_result <- purrr::map(omics_seq_list,~All.match.strings(dataset = .x))
 save(final_result,file = paste0(output_path,"final.result.RData"))
+
+########### 4 Result proprocess ########
+#### 4.1 final peptides from which proteins #### 
+findGeneFun <- function(start,end,index){
+  gene_name <- c()
+  pos <- omicsMatrix.df[which(start >= omicsMatrix.df$startPos 
+                              & end < omicsMatrix.df$endPos
+                              & omicsMatrix.df$ncut %in% index),]
+  if(nrow(pos) == 1){
+    gene_name <- c(gene_name,pos$gene_name_v1)
+  }else{
+    gene_name <- c(gene_name, NULL)
+  }
+  return(gene_name)
+}
+findGeneFun.v2 <- function(starts,ends,indexs){
+  starts <- as.list(starts)
+  ends <- as.list(ends)
+  indexs <- as.list(indexs)
+  l <- list(start = starts,
+            end = ends,
+            index = indexs)
+  gene_names_list <- purrr::pmap(l,findGeneFun)
+  return(gene_names_list)
+}
+
+gene_names <- findGeneFun.v2(starts = finalResult.df$start,
+                             ends = finalResult.df$end,
+                             indexs = finalResult.df$index)
+finalResult.df$geneName <- gene_names
+#### 4.2 peptides from which HLA allele #####
+Tcell_v3_human_match <- Tcell_v3_human %>% 
+  select(description,allele_name) %>% 
+  distinct()
+finalResult.df.1 <- finalResult.df %>% 
+  left_join(Tcell_v3_human_match,by = c("mutate_peptide" = "description")) %>% 
+  distinct()
+finalResult.df.filter <- finalResult.df.1 %>% 
+  select(c(V1,mutate_peptide,allele_name))
+colnames(finalResult.df.1)[1] <- "wildPeptide"
+colnames(finalResult.df.1)[2] <- "mutatePeptide"
+save(finalResult.df.1,file = paste0(output_path,"/final_result_all.RData"))
+save(finalResult.df.filter,file = paste0(output_path,"/final_result_filter.RData"))
+
+########### 5 filter out HLA alleles ##################
+finalResult.df.2 <- finalResult.df.filter[str_detect(string = finalResult.df.filter$allele_name,pattern = "\\w\\w\\w-\\w\\*\\d\\d:\\d\\d"),]
+finalResult.df.3 <- finalResult.df.2 %>% 
+  distinct() %>% 
+  rename(wild_peptide = V1) %>% 
+  mutate(allele_name = str_match(allele_name,pattern = "\\w\\w\\w-\\w\\*\\d\\d:\\d\\d"))
+# take HLA-A*02:01 as an example, users could choose their own desired HLA alleles
+finalResult.df.3.0201.wild <- finalResult.df.3 %>% 
+  filter(allele_name == "HLA-A*02:01") %>% 
+  pull(wild_peptide)
+finalResult.df.3.0201.mutate <- finalResult.df.3 %>% 
+  filter(allele_name == "HLA-A*02:01") %>% 
+  pull(mutate_peptide)
+write.table(finalResult.df.3.0201.wild,
+            file = paste0(output_path,"pos.wild.peptide"),
+            sep = "\t",row.names = F,col.names = F,quote = F)
+write.table(finalResult.df.3.0201.mutate,
+            file = paste0(output_path,"pos.mutate.peptide"),
+            sep = "\t",row.names = F,col.names = F,quote = F)
+
+########### 6 Test Running Time #### 
 time.all <- timeRecord(time1)
 time.list <- list(time.all = time.all)
 save(time.list,file = paste0(output_path,"time.record.RData"))
+
+
+########### Next: Running netMHCpan #### 
+# Running `Pos_netMHCpanRuning.sh`
+

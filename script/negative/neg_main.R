@@ -3,13 +3,13 @@
 # Update Time ：2021-08-22 10:19
 
 #### hyperparameter and library #### 
-input_path <- stringr::str_c(work_path,"input/")
-output_path <- stringr::str_c(work_path,"output/neg")
+input_path <- "./input/"
+output_path <- "./output/neg"
 testGeneNumber <- 3 ### All genes need so much time,we can just test some genes.
 ### fi use test genes,need to commond out：#gene_name_list_test <- gene_name_list[1:testGeneNumber]
 library(tidyverse)
 library(Biostrings)
-
+library(seqinr)
 source("./script/CodonTable.R")
 time1 <- Sys.time()
 ######### 1 input and data preprocessing ####
@@ -91,15 +91,31 @@ time.df.5.3 = timeRecord(time1)
 print("Running in df.5.3")
 df.5.4 = geneProteinFraction(df.5.3,max_peptide_length = 8)
 df.5.5 = generateKmer(df.5.4,max_peptide_length = 8)
-######### save files ####
 save(df.4.3,file = paste0(output_path,"ncbi_final_df.4.3.RData"))
 save(df.5.5,file = paste0(output_path,"ncbi_final_df.5.5.RData"))
+#### 6. output sequence ####
+df.5.6 <- df.5.5 %>% 
+  select(seq_proteins_fraction,mutateseq1_proteins_fraction) %>% 
+  distinct() 
+df.5.6$seq_proteins_fraction <- unlist(df.5.6$seq_proteins_fraction)
+df.5.6$mutateseq1_proteins_fraction <- unlist(df.5.6$mutateseq1_proteins_fraction)
+df.5.6 <- df.5.6 %>% 
+  filter(!(seq_proteins_fraction == mutateseq1_proteins_fraction))
+fraction.choose.wild <- df.5.6$seq_proteins_fraction
+write.fasta(sequences = as.list(fraction.choose.wild),
+            names = fraction.choose.wild,
+            file.out =  paste0(output_path,"fraction.wild.fsa"))
+fraction.choose.mutate <- df.5.6$mutateseq1_proteins_fraction
+write.fasta(sequences = as.list(fraction.choose.mutate),
+            names = fraction.choose.mutate,
+            file.out =  paste0(output_path,"fraction.mutate.fsa"))
 # Running time
 time.all <- timeRecord(time1)
 time.list <- list(time.df.5.2 = time.df.5.2,
                   time.df.5.3 = time.df.5.3,
                   time.all = time.all)
 save(time.list,file = paste0(output_path,"time.record.RData"))
+
 #### Reference ####
 #1 format about GFF：
 #https://github.com/The-Sequence-Ontology/Specifications/blob/master/gff3.md

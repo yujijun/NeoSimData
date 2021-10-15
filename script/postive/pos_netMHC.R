@@ -3,7 +3,7 @@
 #### library and hyperparameter ##### 
 library(tidyverse)
 library(Biostrings)
-library(seqinr)
+
 input_path <- "./output/pos/"
 output_path <- "./output/pos/"
 ############### 1 input and preprocess input dataset #####
@@ -70,100 +70,7 @@ Tcell_v3_human_peptides <- Tcell_v3_human_peptides[!(str_detect(Tcell_v3_human,p
 peptide_list <- Tcell_v3_human_peptides %>% as.list()
 save(Tcell_v3_human,file = paste0(output_path,"/Tcell_v3_human.RData"))
 
-############### 2 final matrix proprocess ########
-#### 2.1 final peptides from which proteins #### 
-findGeneFun <- function(start,end,index){
-  gene_name <- c()
-  pos <- omicsMatrix.df[which(start >= omicsMatrix.df$startPos 
-                                  & end < omicsMatrix.df$endPos
-                              & omicsMatrix.df$ncut %in% index),]
-  if(nrow(pos) == 1){
-    gene_name <- c(gene_name,pos$gene_name_v1)
-  }else{
-    gene_name <- c(gene_name, NULL)
-  }
-  return(gene_name)
-}
-findGeneFun.v2 <- function(starts,ends,indexs){
-  starts <- as.list(starts)
-  ends <- as.list(ends)
-  indexs <- as.list(indexs)
-  l <- list(start = starts,
-            end = ends,
-            index = indexs)
-  gene_names_list <- purrr::pmap(l,findGeneFun)
-  return(gene_names_list)
-}
 
-gene_names <- findGeneFun.v2(starts = finalResult.df$start,
-                             ends = finalResult.df$end,
-                             indexs = finalResult.df$index)
-finalResult.df$geneName <- gene_names
-#### 2.2 peptides from which HLA allele #####
-Tcell_v3_human_match <- Tcell_v3_human %>% 
-  select(description,allele_name) %>% 
-  distinct()
-finalResult.df.1 <- finalResult.df %>% 
-  left_join(Tcell_v3_human_match,by = c("mutate_peptide" = "description")) %>% 
-  distinct()
-finalResult.df.filter <- finalResult.df.1 %>% 
-  select(c(V1,mutate_peptide,allele_name))
-colnames(finalResult.df.1)[1] <- "wildPeptide"
-colnames(finalResult.df.1)[2] <- "mutatePeptide"
-save(finalResult.df.1,file = paste0(output_path,"/final_result_all.RData"))
-save(finalResult.df.filter,file = paste0(output_path,"/final_result_filter.RData"))
-####-------------End----------------####
 
-############ Next ##################
-#### filter out finalResult.df file ##### 
-finalResult.df.2 <- finalResult.df.filter[str_detect(string = finalResult.df.filter$allele_name,pattern = "\\w\\w\\w-\\w\\*\\d\\d:\\d\\d"),]
-finalResult.df.3 <- finalResult.df.2 %>% 
-  distinct() %>% 
-  rename(wild_peptide = V1) %>% 
-  mutate(allele_name = str_match(allele_name,pattern = "\\w\\w\\w-\\w\\*\\d\\d:\\d\\d"))
 
-#### Calculate and load NetMHCpan result ####
-# take HLA-A*02:01 as an example, users could choose their own desired HLA alleles
-finalResult.df.3.0201.wild <- finalResult.df.3 %>% 
-  filter(allele_name == "HLA-A*02:01") %>% 
-  pull(wild_peptide)
-finalResult.df.3.0201.mutate <- finalResult.df.3 %>% 
-  filter(allele_name == "HLA-A*02:01") %>% 
-  pull(mutate_peptide)
-write.table(finalResult.df.3.0201.wild,
-            file = paste0(output_path,"pos.wild.peptide"),
-            sep = "\t",row.names = F,col.names = F,quote = F)
-write.table(finalResult.df.3.0201.mutate,
-            file = paste0(output_path,"pos.mutate.peptide"),
-            sep = "\t",row.names = F,col.names = F,quote = F)
-#### Running netMHCpan #### 
-# Running `Pos_netMHCpanRuning.sh`
-
-#### reformat netMHCpan result ##### 
-mutate.input <- read.delim(file = paste0(output_path,"pos.mutate.peptide.out.1"),sep = "\n")
-wild.input <- read.delim(file = paste0(output_path,"pos.wild.peptide.out.1"),sep = "\n")
-fraction_reformat <- function(fraction.mutate){
-  fraction.mutate.1 <- as.data.frame(fraction.mutate[!str_detect(string = fraction.mutate[,1],pattern = "-----"),])
-  fraction.mutate.2 <- str_split_fixed(string = fraction.mutate.1[,1],pattern = "\\s+",n = Inf)
-  # fraction.mutate.3 <- as.data.frame(fraction.mutate.2) %>% 
-  #   mutate(V1 = rep(protein.mutate %>%  pull(V1),times = protein.times))
-  fraction.mutate.3 <- as.data.frame(fraction.mutate.2) %>% 
-    select(!V1) 
-  # colnames(fraction.mutate.3)[1:14] <- c("Pos","MHC","Peptide",
-  #                                        "Core","Of","Gp","G1",
-  #                                        "Ip","I1","Icore","Identity",
-  #                                        "Score_EL","%Rank_EL","BindLevel")  
-  colnames(fraction.mutate.3) <- NULL
-  rownames(fraction.mutate.3) <- NULL
-  #fraction.mutate.3 <- fraction.mutate.3[,-1]
-  return(fraction.mutate.3)
-}
-mutate.output <- fraction_reformat(mutate.input)
-wild.output <- fraction_reformat(wild.input)
-write.table(mutate.output,
-            file = paste0(output_path,"mutate.netMHCoutput.tsv"),
-            sep = "\t",row.names = F,col.names = F,quote = F)
-write.table(wild.output,
-            file = paste0(output_path,"wild.netMHCoutput.tsv"),
-            sep = "\t",row.names = F,col.names = F,quote = F)
 

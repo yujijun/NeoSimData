@@ -6,18 +6,42 @@ input_path <- "./output/neg/"
 output_path <- "./output/neg/"
 library(tidyverse)
 
-#### Main ####
-reformat.fraction.mutation <- read.table("./output/ncbi/fraction.mutate.fsa.out.1.Rformat.tsv",
-                                sep = "\t")
+#### input #####
+mutate.input <- read.delim(file = paste0(output_path,"fraction.mutate.fsa.out.1"),sep = "\n")
+wild.input <- read.delim(file = paste0(output_path,"fraction.wild.fsa.out.1"),sep = "\n")
+################ reformat netMHCpan result##### 
+## reformat function 
+fraction_reformat <- function(fraction.mutate){
+  fraction.mutate.1 <- as.data.frame(fraction.mutate[!str_detect(string = fraction.mutate[,1],pattern = "-----"),])
+  fraction.mutate.2 <- str_split_fixed(string = fraction.mutate.1[,1],pattern = "\\s+",n = Inf)
+  # fraction.mutate.3 <- as.data.frame(fraction.mutate.2) %>% 
+  #   mutate(V1 = rep(protein.mutate %>%  pull(V1),times = protein.times))
+  fraction.mutate.3 <- as.data.frame(fraction.mutate.2) %>% 
+    select(!V1)
+  colnames(fraction.mutate.3)[1:14] <- c("Pos","MHC","Peptide",
+                                         "Core","Of","Gp","G1",
+                                         "Ip","I1","Icore","Identity",
+                                         "Score_EL","%Rank_EL","BindLevel")  
+  return(fraction.mutate.3)
+}
+##Running 
+mutate.result <- fraction_reformat(mutate.input)
+
+wild.result <- fraction_reformat(wild.input)
+write.table(wild.result,file = paste0(output_path,"fraction.wild.fsa.out.1.Rformat.tsv"),
+            sep = "\t",row.names = F,col.names = T,quote = F)
+write.table(mutate.result,file = paste0(output_path,"fraction.mutate.fsa.out.1.Rformat.tsv"),
+            sep = "\t",row.names = F,col.names = T,quote = F)
+
+#### merge mutation and wild result ####
+## mutation peptides
 colnames(reformat.fraction.mutation) <- reformat.fraction.mutation[1,]
 reformat.fraction.mutation <- reformat.fraction.mutation[-1,]
 reformat.fraction.mutation <- reformat.fraction.mutation %>% 
   select("MHC","Peptide","Identity","Score_EL","%Rank_EL","BindLevel","V16") %>% 
   unite(col = "BindLevel", c(BindLevel,V16),sep = " ",remove = TRUE)
 colnames(reformat.fraction.mutation) <- paste0("mut_",colnames(reformat.fraction.mutation))
-
-reformat.fraction.wild <- read.table("./output/ncbi/fraction.wild.fsa.out.1.Rformat.tsv",
-                                sep = "\t")
+## wild peptide 
 colnames(reformat.fraction.wild) <- reformat.fraction.wild[1,]
 reformat.fraction.wild <- reformat.fraction.wild[-1,]
 reformat.fraction.wild <- reformat.fraction.wild %>% 
