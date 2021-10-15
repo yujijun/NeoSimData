@@ -25,15 +25,22 @@ In this tutorial,we use `HLA-A*02:01` as an example.
 
 ## Requirement 
 
-### R 
+### R Environment
+
 R version 4.0.3 (2020-10-10)
 
 attached base packages:
-[1] stats     graphics  grDevices
-[4] utils     datasets  methods  
+
+[1] stats     
+[2] graphics  
+[3] grDevices
+[4] utils     
+[5] datasets  
+[6] methods  
 [7] base     
 
 other attached packages:
+
  [1] seqinr_4.2-8       
  [2] Biostrings_2.58.0  
  [3] XVector_0.30.0     
@@ -51,8 +58,9 @@ other attached packages:
 [15] tidyverse_1.3.1  
 
 ### MHC peptides binding prediction software
-NetMHCpan-4.1 
-NetMHCIIpan-4.0
+
+[1] NetMHCpan-4.1 
+[2] NetMHCIIpan-4.0
 
 # Usage:
 ```
@@ -72,13 +80,22 @@ cd /input
 ./script/pos_format.R ## Format and filter NetMHCpan Running result, put all peptides togethers. 
 ```
 
-## Output example 
-!()[]
+## Output example
+
+All of the result was after filtered from NetMHCpan result.
+
+!(Postive result example)[https://github.com/yujijun/NeoSimData/blob/main/output/Positive_example.png]
+
+!(Negative result example)[https://github.com/yujijun/NeoSimData/blob/main/output/Negative_example.png]
 
 ## Reference:
+
 [1] Vita R, Mahajan S, Overton JA, Dhanda SK, Martini S, Cantrell JR, Wheeler DK, Sette A, Peters B. The Immune Epitope Database (IEDB): 2018 update. Nucleic Acids Res. 2018 Oct 24. doi: 10.1093/nar/gky1006. [Epub ahead of print] PubMed PMID: 30357391.
+
 [2] The Universal Protein Resource (UniProt) Nucleic Acides Res.2008 Jan; 36(Dataset issue):D190-D195.
+
 [3] NetMHCpan-4.1 and NetMHCIIpan-4.0: improved predictions of MHC antigen presentation by concurrent motif deconvolution and integration of MS MHC eluted ligand data. Nucleic Acids Research, Volume 48, Issue W1, 02 July 2020, Pages W449–W454, https://doi.org/10.1093/nar/gkaa379
+
 [4] Neopepsee: accurate genome-level prediction of
 neoantigens by harnessing sequence and amino acid
 immunogenicity information. Annals of Oncology 29: 1030–1036, 2018
