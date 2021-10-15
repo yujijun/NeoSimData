@@ -31,10 +31,10 @@ R version 4.0.3 (2020-10-10)
 
 attached base packages:
 
-[1] stats     
-[2] graphics  
-[3] grDevices
-[4] utils     
+[1] stats      
+[2] graphics   
+[3] grDevices 
+[4] utils       
 [5] datasets  
 [6] methods  
 [7] base     
@@ -47,7 +47,7 @@ other attached packages:
  [4] IRanges_2.24.1     
  [5] S4Vectors_0.28.1   
  [6] BiocGenerics_0.36.1
- [7] forcats_0.5.1      
+ [7] forcats_0.5.1        
  [8] stringr_1.4.0      
  [9] dplyr_1.0.7        
 [10] purrr_0.3.4        
@@ -59,7 +59,7 @@ other attached packages:
 
 ### MHC peptides binding prediction software
 
-[1] NetMHCpan-4.1 
+[1] NetMHCpan-4.1   
 [2] NetMHCIIpan-4.0
 
 # Usage:
@@ -84,9 +84,9 @@ cd /input
 
 All of the result was after filtered from NetMHCpan result.
 
-!(Postive result example)[https://github.com/yujijun/NeoSimData/blob/main/output/Positive_example.png]
+![Postive result example](https://github.com/yujijun/NeoSimData/blob/main/output/Positive_example.png)
 
-!(Negative result example)[https://github.com/yujijun/NeoSimData/blob/main/output/Negative_example.png]
+![Negative result example](https://github.com/yujijun/NeoSimData/blob/main/output/Negative_example.png)
 
 ## Reference:
 
