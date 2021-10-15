@@ -32,11 +32,10 @@ R version 4.0.3 (2020-10-10)
 attached base packages:
 
 [1] stats      
-[2] graphics   
-[3] grDevices 
-
-[4] utils       
-[5] datasets  
+[2] graphics     
+[3] grDevices     
+[4] utils        
+[5] datasets    
 [6] methods  
 [7] base     
 
@@ -47,8 +46,7 @@ other attached packages:
  [3] XVector_0.30.0     
  [4] IRanges_2.24.1     
  [5] S4Vectors_0.28.1   
- [6] BiocGenerics_0.36.1 
- 
+ [6] BiocGenerics_0.36.1     
  [7] forcats_0.5.1        
  [8] stringr_1.4.0      
  [9] dplyr_1.0.7        
