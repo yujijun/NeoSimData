@@ -73,14 +73,16 @@ cd /input
 ./download.sh #download all needed input files.
 
 #### negative neopeptides dataset:
-./script/neg_main.R  ## Generate protein fractions of wild and mutation 
-./script/Neg_netMHCpanRunning.sh ## Running NetMHCpan for MHC peptide affinity information. attention: Change into your own NetMHCpan path. 
-./script/neg_format.R ## Format and filter NetMHCpan Running result, put all peptides togethers. 
+./script/negative/neg_main.R  ## Generate protein fractions of wild and mutation 
+./script/negative/neg_netMHC.R ## 
+format result from neg_main.R suitable to netMHCpan
+./script/negative/Neg_netMHCpanRunning.sh ## Running NetMHCpan for MHC peptide affinity information. attention: Change into your own NetMHCpan path. 
+./script/negative/neg_format.R ## Format and filter NetMHCpan Running result, put all peptides togethers. 
 
 #### positive neopeptides dataset:
-./script/pos_main.R  ## Generate protein fractions of wild and mutation 
-./script/Pos_netMHCpanRunning.sh ## Running NetMHCpan for MHC peptide affinity information. attention: Change into your own NetMHCpan path. 
-./script/pos_format.R ## Format and filter NetMHCpan Running result, put all peptides togethers. 
+./script/positive/pos_main.R  ## Generate protein fractions of wild and mutation 
+./script/positive/Pos_netMHCpanRunning.sh ## Running NetMHCpan for MHC peptide affinity information. attention: Change into your own NetMHCpan path. 
+./script/positive/pos_format.R ## Format and filter NetMHCpan Running result, put all peptides togethers. 
 ```
 
 ## Output example
