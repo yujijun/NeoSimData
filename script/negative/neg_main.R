@@ -6,7 +6,7 @@
 input_path <- "./input/"
 output_path <- "./output/neg"
 testGeneNumber <- 3 ### All genes need so much time,we can just test some genes.
-### fi use test genes,need to commond out：#gene_name_list_test <- gene_name_list[1:testGeneNumber]
+### if use test genes,need to commond out：#gene_name_list_test <- gene_name_list[1:testGeneNumber]
 library(tidyverse)
 library(Biostrings)
 library(seqinr)

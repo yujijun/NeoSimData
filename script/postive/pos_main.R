@@ -5,6 +5,7 @@
 ########### hyperparameter and library #####
 input_path <- "./input/"
 output_path <- "./output/pos"
+HLA_allele <- "HLA-A*02:01" #### change HLA allele
 library(tidyverse)
 library(Biostrings)
 library(seqinr)
@@ -219,12 +220,13 @@ finalResult.df.3 <- finalResult.df.2 %>%
   distinct() %>% 
   rename(wild_peptide = V1) %>% 
   mutate(allele_name = str_match(allele_name,pattern = "\\w\\w\\w-\\w\\*\\d\\d:\\d\\d"))
+
 # take HLA-A*02:01 as an example, users could choose their own desired HLA alleles
 finalResult.df.3.0201.wild <- finalResult.df.3 %>% 
-  filter(allele_name == "HLA-A*02:01") %>% 
+  filter(allele_name == HLA_allele) %>% 
   pull(wild_peptide)
 finalResult.df.3.0201.mutate <- finalResult.df.3 %>% 
-  filter(allele_name == "HLA-A*02:01") %>% 
+  filter(allele_name == HLA_allele) %>% 
   pull(mutate_peptide)
 write.table(finalResult.df.3.0201.wild,
             file = paste0(output_path,"pos.wild.peptide"),

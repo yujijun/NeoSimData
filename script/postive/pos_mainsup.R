@@ -1,5 +1,5 @@
 #### Description ######## 
-# formatting result form pos_main.R and running netMHCpan
+# formatting result from pos_main.R
 #### library and hyperparameter ##### 
 library(tidyverse)
 library(Biostrings)
@@ -9,6 +9,7 @@ output_path <- "./output/pos/"
 ############### 1 input and preprocess input dataset #####
 #### 1.1 load final result ####
 load(paste0(input_path,"final.result.RData"))
+
 #### 1.2 convert final result list into a dataframe ####
 for(i in length(final_result):1){
   if(!is.null(final_result[[i]])){
@@ -41,6 +42,7 @@ omicsMatrix.df <- omicsMatrix.df %>%
   dplyr::rename(endPos = cumsum_length) %>% 
   select(gene_name_v1,startPos,endPos,ncut,seq_length,omics_seq,gene_name)
 save(omicsMatrix.df,file = paste0(output_path,"/omics_matrix.RData"))
+
 #### 1.4 Tcell dataset preprocess #####
 Tcell_v3 <- read.delim("./input/tcell_full_v3.csv",sep = ",",header = T)
 Tcell_v3_clean <- Tcell_v3 %>%  
