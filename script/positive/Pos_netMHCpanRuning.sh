@@ -9,3 +9,5 @@ grep -v "^#" pos.mutate.peptide.out |  grep -v "^ Pos" | grep -v "^HLA" | grep -
 grep -v "^#" fraction.wild.fsa.out |  grep -v "^ Pos" | grep -v "^HLA" | grep -v "^Protein" > pos.wild.peptide.out.1
 
 cd .../..
+
+#python /public/home/wumeng01/NeoantigenML/QBRC-Neoantigen-Pipeline/code/mhc_i/src/predict_binding.py netmhcpan_ba HLA-A*02:01 9 pos.mutate.peptide
